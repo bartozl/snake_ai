@@ -1,0 +1,20 @@
+{
+  "P": 400,
+  "H": 4,
+  "W": 4,
+  "M": 1,
+  "R": "gradient",
+  "epsilon": "sinusoidal",
+  "gamma": 0.95,
+  "n_games": 20000,
+  "observe": 0.25,
+  "bs": 256,
+  "channels": 4,
+  "len_mem": 1000,
+  "augment": 5,
+  "save_every": 0.1,
+  "train": true,
+  "test": false,
+  "show": false,
+  "run": 0
+}
