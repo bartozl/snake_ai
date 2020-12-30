@@ -40,9 +40,6 @@ def compute_epsilon(n_games, observe=0.2, mode='linear'):
         n = X // 800
         epsilon = 0.5 * np.power(e_d, x) * (1 + np.cos(2 * np.pi * n * x / X))
 
-    if mode == 'exp':
-        raise NotImplementedError
-
     return epsilon
 
 
@@ -65,7 +62,7 @@ def execute_action(snake_world, action):
 
 
 def compute_Q_target(mini_batch, model, gamma, lost_reward):
-    # vectorized implementation
+    # vectorized implementation of the Q learning algorithm
     state_curr = np.concatenate(mini_batch[:, 0], axis=0)
     action = np.stack(mini_batch[:, 1], axis=0)  # shape [256, 4]
     reward = mini_batch[:, 2]
@@ -100,7 +97,8 @@ def save_infos(run_path, memory, game, data_new, verbose=True):
 def load_infos(run_path):
     try:
         latest = tf.train.latest_checkpoint(f'{run_path}/checkpoints/')
-        game = int(''.join(filter(str.isdigit, latest)))
+        # e.g, latest = ./run_1/checkpoints/weights_20000
+        game = int(''.join(filter(str.isdigit, latest.split('/')[-1])))
         memory = list(np.load(f'{run_path}/memory/{game}.npy', allow_pickle=True))
     except (AttributeError, TypeError):
         latest = None

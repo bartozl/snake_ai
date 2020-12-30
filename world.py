@@ -4,7 +4,7 @@ import pygame
 
 
 class World:
-    def __init__(self, screen, height, width, margin, pixels, update_speed=15, reward='gradient', game_num=0):
+    def __init__(self, screen, height, width, margin, pixels, update_speed=8, reward='gradient', game_num=0):
         self.H = height
         self.W = width
         self.clean_grid = np.zeros((self.H, self.W), dtype=np.int)
@@ -15,7 +15,7 @@ class World:
         self.update_speed = update_speed
         self.clock = pygame.time.Clock()
 
-        self.snake_body = [(self.H//2, self.W//2)]
+        self.snake_body = [(self.H // 2, self.W // 2)]
         self.snake_head = self.snake_body[0]
         self.reward_type = reward
         self.apple = self.place_apple()
@@ -35,7 +35,7 @@ class World:
         pygame.display.set_caption(self.caption)
 
     def set_reward(self):
-        if self.reward_type == 'linear':
+        if self.reward_type == 'discrete':
             reward = {'lost': -10, 'step': np.ones((self.H, self.W)) * -3, 'eat': 10}
         elif self.reward_type == 'gradient':
             grid = None
@@ -84,23 +84,6 @@ class World:
                 x += self.pixels + self.margin
             y += self.pixels + self.margin
 
-    def capture_events(self):
-        reward = 0
-        while reward != self.reward['lost']:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit(0)
-                if event.type == pygame.KEYDOWN:
-                    for action_name in self.control:  # action_name = ['UP', 'DOWN', 'LEFT', 'RIGHT']
-                        if event.scancode == self.control[action_name]:
-                            action_code = self.actions[action_name]
-                            self.change_direction(action_code)
-            reward = self.step()
-            self.update_world()
-            if self.screen is not None:
-                self.draw_world()
-                self.show_world()
-
     def change_direction(self, action_code):
         # action_code is in the form [1, 0, 0, 0]
         action_name = list(self.actions.keys())[list(action_code).index(1)]
@@ -137,8 +120,8 @@ class World:
 
         # check if a wall has been touched or if the body has been hit by the head
         if (check_head[0] < 0) or (check_head[0] >= self.H) or \
-           (check_head[1] < 0) or (check_head[1] >= self.W) or \
-           (check_head in self.snake_body[1:]):
+                (check_head[1] < 0) or (check_head[1] >= self.W) or \
+                (check_head in self.snake_body[1:]):
             self.caption = 'OPS! You lose!'
             return self.reward['lost']
         else:
@@ -169,19 +152,24 @@ class World:
         else:
             return candidates[np.random.randint(len(candidates))]
 
+    """
+    def capture_events(self):
+        reward = 0
+        while reward != self.reward['lost']:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit(0)
+                if event.type == pygame.KEYDOWN:
+                    for action_name in self.control:  # action_name = ['UP', 'DOWN', 'LEFT', 'RIGHT']
+                        if event.scancode == self.control[action_name]:
+                            action_code = self.actions[action_name]
+                            self.change_direction(action_code)
+            reward = self.step()
+            self.update_world()
+            if self.screen is not None:
+                self.draw_world()
+                self.show_world()
+
     def play(self):
         self.capture_events()
-
-
-'''
-height = 4
-width = 4
-pixels = 100
-margin = 1
-
-screen_h = height * pixels + margin * height
-screen_w = width * pixels + margin * height
-screen = pygame.display.set_mode((screen_h, screen_w))
-w = World(screen, height, width, margin, pixels, update_speed=5)
-w.play()
-'''
+    """
